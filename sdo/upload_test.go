@@ -2,8 +2,8 @@ package sdo
 
 import (
 	"bytes"
-	"github.com/brutella/can"
-	"github.com/brutella/canopen"
+	"github.com/ast-dd/can"
+	"github.com/ast-dd/canopen"
 	"reflect"
 	"testing"
 )
