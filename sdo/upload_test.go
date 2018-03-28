@@ -6,22 +6,25 @@ import (
 	"github.com/ast-dd/canopen"
 	"reflect"
 	"testing"
+	"syscall"
 )
 
 type uploadReadWriteCloser struct {
-	buf bytes.Buffer
+	writeFd int
 }
 
 func (rw *uploadReadWriteCloser) Read(b []byte) (n int, err error) {
-	return rw.buf.Read(b)
+	panic("Read() shouldn't be called anymore")
 }
 
+// write uploadFrame instead of given data
 func (rw *uploadReadWriteCloser) Write(b []byte) (n int, err error) {
-	if b, err := can.Marshal(uploadFrame); err == nil {
-		return rw.buf.Write(b)
+	if response, err := can.Marshal(uploadFrame); err == nil {
+		err = syscall.Sendmsg(rw.writeFd, response, nil, nil, 0)
+		n = len(b)
 	}
 
-	return len(b), nil
+	return
 }
 
 func (rw *uploadReadWriteCloser) Close() error { return nil }
@@ -49,7 +52,11 @@ func HandleUpload(b []byte) (n int, err error) {
 }
 
 func TestExpeditedUpload(t *testing.T) {
-	rwc := can.NewReadWriteCloser(&uploadReadWriteCloser{})
+	pair, err := syscall.Socketpair(syscall.AF_UNIX, syscall.SOCK_DGRAM, 0)
+	if err != nil {
+		panic(err)
+	}
+	rwc := can.NewReadWriteCloser(&uploadReadWriteCloser{writeFd: pair[0]}, pair[1])
 	bus := can.NewBus(rwc)
 
 	go bus.ConnectAndPublish()
