@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	ClientIntiateDownload = 0x20 // 0010 0000
-	ClientSegmentDownload = 0x00 // 0110 0000
+	ClientInitiateDownload = 0x20 // 0010 0000
+	ClientSegmentDownload  = 0x00 // 0110 0000
 
 	ServerInitiateDownload = 0x60 // 0110 0000
 	ServerSegmentDownload  = 0x20 // 0010 0000
@@ -51,7 +51,7 @@ func (download Download) Do(bus *can.Bus) error {
 	}
 
 	bytes := []byte{
-		byte(ClientIntiateDownload | e | s | ((int(n) << 2) & TransferMaskSize)),
+		byte(ClientInitiateDownload | e | s | ((int(n) << 2) & TransferMaskSize)),
 		download.ObjectIndex.Index.B0, download.ObjectIndex.Index.B1,
 		download.ObjectIndex.SubIndex,
 	}
