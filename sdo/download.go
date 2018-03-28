@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/ast-dd/can"
 	"github.com/ast-dd/canopen"
-	"log"
 	"time"
 )
 
@@ -65,7 +64,7 @@ func (download Download) Do(bus *can.Bus) error {
 	req := canopen.NewRequest(frame, uint32(download.ResponseCobID))
 	resp, err := c.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	frame = resp.Frame
@@ -77,7 +76,7 @@ func (download Download) Do(bus *can.Bus) error {
 	case TransferAbort:
 		return errors.New("Server aborted download")
 	default:
-		log.Fatalf("Unexpected server command specifier %X", scs)
+		return fmt.Errorf("unexpected server command specifier %X", scs)
 	}
 
 	if e == 0 {
