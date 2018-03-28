@@ -15,11 +15,12 @@ type Client struct {
 // Do sends a request and waits for a response.
 // If the response frame doesn't arrive on time, an error is returned.
 func (c *Client) Do(req *Request) (*Response, error) {
+	waitChannel := can.Wait(c.Bus, req.ResponseID, c.Timeout)
 	if err := c.Bus.Publish(req.Frame.CANFrame()); err != nil {
 		return nil, err
 	}
 
-	resp := <-can.Wait(c.Bus, req.ResponseID, c.Timeout)
+	resp := <-waitChannel
 
 	return &Response{CANopenFrame(resp.Frame), req}, resp.Err
 }
