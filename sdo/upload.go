@@ -53,7 +53,8 @@ func (upload Upload) Do(bus *can.Bus) ([]byte, error) {
 	case ServerInitiateUpload:
 		break
 	case TransferAbort:
-		return nil, errors.New("Server aborted upload")
+		abortCode := binary.LittleEndian.Uint32(frame.Data[4:])
+		return nil, &SdoError{errors.New("server aborted upload"), abortCode}
 	default:
 		log.Fatalf("Unexpected server command specifier %X", scs)
 	}

@@ -1,0 +1,43 @@
+package sdo
+
+import "fmt"
+
+type SdoError struct {
+	err       error
+	AbortCode uint32
+}
+
+func (e *SdoError) Error() string {
+	return fmt.Sprintf("%s: %#x %s", e.err, e.AbortCode, e.AbortString())
+}
+
+func (e *SdoError) AbortString() (name string) {
+	name = sdoAbortCodes[e.AbortCode]
+	return
+}
+
+var sdoAbortCodes = map[uint32]string{
+	0x00000000: "OK",
+	0x05030000: "TOGGLE_MISMATCH",
+	0x05040000: "SDO_TIMEOUT",
+	0x05040001: "SDO_UNKNOWN_CCS",
+	0x05040002: "SDO_WRONG_BLOCKSIZE",
+	0x05040003: "SDO_WRONG_SEQ_NR",
+	0x05040004: "SDO_CRC_ERROR",
+	0x05040005: "OUT_OF_MEMORY",
+	0x06010000: "SDO_TRANSFER_NOT_SUPPORTED",
+	0x06010001: "NO_READ_PERM",
+	0x06010002: "NO_WRITE_PERM",
+	0x06020000: "IDX_NOT_FOUND",
+	0x06040041: "MAP_ERROR",
+	0x06040042: "MAP_LEN_ERROR",
+	0x06040043: "PARAMETER_INCOMPATIBLE",
+	0x06040047: "OD_ACCESS_ERROR",
+	0x06060000: "HARDWARE_ERROR",
+	0x06070010: "SDO_DATA_TYPE_NOT_MATCH",
+	0x06090011: "SUBIDX_NOT_FOUND",
+	0x06090030: "SDO_INVALID_VALUE",
+	0x08000020: "ERROR_STORE",
+	0x08000022: "ERROR_PRESENT_DEVICE_STATE",
+	0x08000024: "VALUE_NOT_AVAILABLE",
+}

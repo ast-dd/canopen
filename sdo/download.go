@@ -74,7 +74,8 @@ func (download Download) Do(bus *can.Bus) error {
 	case ServerInitiateDownload:
 		break
 	case TransferAbort:
-		return errors.New("Server aborted download")
+		abortCode := binary.LittleEndian.Uint32(frame.Data[4:])
+		return &SdoError{errors.New("server aborted download"), abortCode}
 	default:
 		return fmt.Errorf("unexpected server command specifier %X", scs)
 	}
